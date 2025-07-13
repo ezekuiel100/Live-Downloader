@@ -1,7 +1,19 @@
 import sys
+import os
+import secrets
 from streamlink import Streamlink
 
-def download_twitch_live(channel , output_filename):
+def generate_file_name(channel):     
+    while True:
+        id = secrets.randbelow(1_000_000)
+        file_name = channel + str(id)
+
+        if not os.path.exists(file_name):
+            return file_name
+
+
+def download_twitch_live(channel):
+    file_name =  generate_file_name(channel)
     session = Streamlink()
     url = f"https://www.twitch.tv/{channel}"
 
@@ -17,8 +29,8 @@ def download_twitch_live(channel , output_filename):
 
     fd = stream.open()
 
-    with open(output_filename, "wb") as f:
-        print(f"Iniciando download de {channel} em '{output_filename}'... Pressione Ctrl+C para parar.")
+    with open(file_name, "wb") as f:
+        print(f"Iniciando download de {channel} em '{file_name}'... Pressione Ctrl+C para parar.")
         try:
             while True:
                 data = fd.read(1024)
@@ -33,12 +45,11 @@ def download_twitch_live(channel , output_filename):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print("Uso: python download_twitch.py <canal> <arquivo_saida.ts>")
+    if len(sys.argv) != 2:
+        print("Uso: python download_twitch.py <canal>")
         sys.exit(1)
 
     canal = sys.argv[1]
-    arquivo = sys.argv[2]
-    download_twitch_live(canal, arquivo)
+    download_twitch_live(canal)
 
                
